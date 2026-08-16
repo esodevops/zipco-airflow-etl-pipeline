@@ -1,11 +1,30 @@
+import os
 from datetime import timedelta
-from airflow import DAG
+
 import pendulum
+from airflow import DAG
+from airflow.providers.smtp.notifications.smtp import send_smtp_notification
 from airflow.providers.standard.operators.python import PythonOperator
-from datetime import datetime
-from scripts.extraction import extraction 
-from scripts.transformation import transformation
+
 from scripts.loading import loading
+from scripts.extraction import extraction
+from scripts.transformation import transformation
+
+
+ALERT_EMAIL = os.getenv("AIRFLOW_ALERT_EMAIL")
+
+dag_failure_notification = send_smtp_notification(
+    smtp_conn_id="smtp_default",
+    from_email=ALERT_EMAIL,
+    to=ALERT_EMAIL,
+    subject="[Airflow] DAG {{ dag.dag_id }} failed",
+    html_content="""
+        <p>DAG <strong>{{ dag.dag_id }}</strong> failed.</p>
+        <p>Run: {{ run_id }}</p>
+        <p>Failed task: {{ ti.task_id }}</p>
+        <p><a href="{{ ti.log_url }}">View task logs</a></p>
+    """,
+)
 
 
 default_args = {
@@ -24,6 +43,7 @@ with DAG(
     schedule="*/10 * * * *",  # Use None for manual execution
     catchup=False,
     tags=["zipco", "etl"],
+    on_failure_callback=[dag_failure_notification],
 ) as dag:
 
     extraction_task = PythonOperator(
