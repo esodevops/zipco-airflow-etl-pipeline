@@ -1,0 +1,56 @@
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Python virtual environments
+.venv/
+venv/
+env/
+ENV/
+zipco_ENV/
+
+# Python caches and build artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.eggs/
+build/
+dist/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Airflow runtime state, logs, databases, and generated credentials
+airflow/
+airflow.cfg
+airflow.db*
+logs/
+simple_auth_manager_passwords.json.generated
+
+# Generated ETL outputs
+dataset/cleaned_data/
+
+# Local notes
+NOTES/
+
+# Editors and operating systems
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Temporary files
+*.log
+*.tmp
+*.bak
