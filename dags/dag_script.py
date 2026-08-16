@@ -40,7 +40,7 @@ with DAG(
     default_args=default_args,
     description="Zipco batch ETL pipeline",
     start_date=pendulum.datetime(2026, 8, 16, tz="Europe/Helsinki"),
-    schedule="*/10 * * * *",  # Use None for manual execution
+    schedule=None,  # Use None for manual execution
     catchup=False,
     tags=["zipco", "etl"],
     on_failure_callback=[dag_failure_notification],

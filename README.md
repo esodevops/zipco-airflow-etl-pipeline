@@ -38,7 +38,16 @@ The DAG is named `zipco_food_dag` and is scheduled to run every 10 minutes.
 
 ## Setup
 
-Clone the project, create a virtual environment, and install the dependencies:
+Clone the repository and enter the project directory:
+
+```bash
+git clone https://github.com/esodevops/zipco-airflow-etl-pipeline.git
+cd zipco-airflow-etl-pipeline
+```
+
+Replace `<your-github-username>` with the GitHub account or organization that owns the repository.
+
+Create a virtual environment and install the dependencies:
 
 ```bash
 python3 -m venv .venv
@@ -101,6 +110,52 @@ To display the generated local password:
 ```bash
 cat "$AIRFLOW_HOME/simple_auth_manager_passwords.json.generated"
 ```
+
+## Configure Airflow SMTP alerts
+
+The DAG sends an email when a run fails. It uses the Airflow connection ID `smtp_default` and reads the sender and recipient address from `AIRFLOW_ALERT_EMAIL`.
+
+The SMTP provider is included in `requirements.txt`. After installing the project dependencies, export your alert address before starting Airflow:
+
+```bash
+export AIRFLOW_ALERT_EMAIL="your-email@example.com"
+```
+
+### Gmail example
+
+For Gmail, enable two-step verification and create an app password. Use the app password rather than your normal account password. Then create the Airflow SMTP connection:
+
+```bash
+read -s -p "Gmail app password: " SMTP_APP_PASSWORD
+echo
+export SMTP_APP_PASSWORD
+
+airflow connections delete smtp_default 2>/dev/null || true
+airflow connections add smtp_default \
+  --conn-type smtp \
+  --conn-host smtp.gmail.com \
+  --conn-port 587 \
+  --conn-login "$AIRFLOW_ALERT_EMAIL" \
+  --conn-password "$SMTP_APP_PASSWORD" \
+  --conn-extra '{"disable_ssl": true, "from_email": "your-email@example.com"}'
+
+unset SMTP_APP_PASSWORD
+```
+
+Replace the `from_email` value with the same address assigned to `AIRFLOW_ALERT_EMAIL`. Port `587` uses STARTTLS, so SSL is disabled while TLS remains enabled.
+
+For another mail provider, replace the host, port, username, and TLS/SSL options with the values supplied by that provider. Common configurations are:
+
+- Port `587`: STARTTLS with `disable_ssl` set to `true`.
+- Port `465`: implicit SSL; omit `disable_ssl`.
+
+Verify that Airflow can see the connection:
+
+```bash
+airflow connections get smtp_default
+```
+
+Restart `airflow standalone` after exporting `AIRFLOW_ALERT_EMAIL`. To test the notification, trigger a controlled DAG failure and confirm that the alert arrives. Do not commit SMTP passwords or app passwords to `.env`, the DAG, or the README.
 
 ## Generated outputs
 
