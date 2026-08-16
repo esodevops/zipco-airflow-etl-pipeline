@@ -1,0 +1,9 @@
+ipykernel==7.3.0
+jupyter_client==8.9.1
+pandas==3.0.5
+psycopg2-binary==2.9.12
+python-dotenv==1.2.2
+SQLAlchemy==2.0.51
+azure-storage-blob==12.30.0
+apache-airflow==3.3.0
+apache-airflow-providers-smtp
