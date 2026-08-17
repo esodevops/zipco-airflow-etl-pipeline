@@ -6,4 +6,4 @@ python-dotenv==1.2.2
 SQLAlchemy==2.0.51
 azure-storage-blob==12.30.0
 apache-airflow==3.3.0
-apache-airflow-providers-smtp
+apache-airflow-providers-smtp==3.0.2
